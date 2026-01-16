@@ -76,3 +76,4 @@ async function loadHistory() {
 
 // Запускаємо функцію при завантаженні
 loadHistory();
+alert("працює");
