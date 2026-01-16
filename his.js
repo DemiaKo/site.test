@@ -1,8 +1,6 @@
 // Налаштування (Ключі для фронтенду можна брати з .env, але для простоти встав URL і ANON key сюди)
 // УВАГА: Тут вставляй ключ ANON (public), а не service_role!
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
 
 const timelineContainer = document.getElementById('timeline-container');
 
