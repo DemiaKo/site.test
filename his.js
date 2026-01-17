@@ -15,7 +15,7 @@ async function loadHistory() {
     const { data: events, error } = await historyDb
         .from('history')
         .select('*')
-        .order('year', { ascending: false })
+        .order('year', { ascending: true })
         .order('id', { ascending: true });
 
     // 4. Діагностика помилок
@@ -76,7 +76,8 @@ async function loadHistory() {
             contentBlock.appendChild(h3);
 
             const p = document.createElement('p');
-            p.textContent = event.description;
+            p.innerHTML = event.description.replace(/\n/g, '<br>');
+            
             contentBlock.appendChild(p);
         });
 
