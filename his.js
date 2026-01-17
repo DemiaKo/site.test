@@ -6,7 +6,7 @@ const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 // Це вирішить проблему "Identifier has already been declared"
 const historyDb = window.supabase.createClient(projectUrl, anonKey);
 
-const timelineContainer = document.getElementById('timeline-container');
+const timelineContainer = document.getElementById('timeline');
 
 async function loadHistory() {
     console.log("🔄 Починаю завантаження історії...");
