@@ -1,23 +1,38 @@
-// Налаштування (Ключі для фронтенду можна брати з .env, але для простоти встав URL і ANON key сюди)
-// УВАГА: Тут вставляй ключ ANON (public), а не service_role!
+// 1. Встав свої дані сюди
+const projectUrl = 'https://agkjchoskicbsfuuoboq.supabase.co'; // (https://...supabase.co)
+const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFna2pjaG9za2ljYnNmdXVvYm9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODg3NDQsImV4cCI6MjA4NDE2NDc0NH0.Iz8nj08vvEi5oRkaWQEfcucjhFSn59BogmrtQ82_0Tw';      // (eyJ...)
 
+// 2. Створюємо підключення з УНІКАЛЬНОЮ назвою "historyDb"
+// Це вирішить проблему "Identifier has already been declared"
+const historyDb = window.supabase.createClient(projectUrl, anonKey);
 
 const timelineContainer = document.getElementById('timeline-container');
 
 async function loadHistory() {
-    // 1. Беремо дані, сортуємо: спочатку нові роки, всередині року - старі події зверху
-    const { data: events, error } = await supabase
+    console.log("🔄 Починаю завантаження історії...");
+
+    // 3. Робим запит до бази (використовуємо historyDb)
+    const { data: events, error } = await historyDb
         .from('history')
         .select('*')
-        .order('year', { ascending: false }) // 2025, 2024, 2023...
-        .order('id', { ascending: true });   // Порядок додавання всередині року
+        .order('year', { ascending: false })
+        .order('id', { ascending: true });
 
+    // 4. Діагностика помилок
     if (error) {
-        console.error('Помилка:', error);
+        console.error('❌ Помилка Supabase:', error.message);
         return;
     }
 
-    // 2. ГРУПУВАННЯ: Перетворюємо список подій на об'єкт типу { "2024": [подія1, подія2], "2023": [подія1] }
+    if (!events || events.length === 0) {
+        console.warn('⚠️ База даних пуста або доступ заблоковано (RLS)!');
+        timelineContainer.innerHTML = '<p style="text-align:center;">Історія поки що пуста...</p>';
+        return;
+    }
+
+    console.log(`✅ Отримано подій: ${events.length}`);
+
+    // 5. Групування та малювання (код той самий)
     const groupedByYear = {};
     
     events.forEach(event => {
@@ -27,51 +42,49 @@ async function loadHistory() {
         groupedByYear[event.year].push(event);
     });
 
-    // 3. МАЛЮВАННЯ НА СТОРІНЦІ
-    // Проходимось по роках (ключі об'єкта)
+    timelineContainer.innerHTML = '';
+
     Object.keys(groupedByYear).sort((a, b) => b - a).forEach(year => {
-        
-        const yearEvents = groupedByYear[year]; // Список подій цього року
+        const yearEvents = groupedByYear[year];
 
-        // Створюємо головний блок timeline-item
+        // Головний блок
         const item = document.createElement('div');
-        item.classList.add('timeline-item'); // Твій клас CSS
+        item.classList.add('timeline-item');
 
-        // Блок року
+        // Рік
         const yearBlock = document.createElement('div');
-        yearBlock.classList.add('timeline-year'); // Твій клас для кружечка з роком
+        yearBlock.classList.add('timeline-year');
         yearBlock.textContent = year;
 
-        // Блок контенту (білий прямокутник)
+        // Контент
         const contentBlock = document.createElement('div');
-        contentBlock.classList.add('timeline-content'); // Твій клас для тексту
+        contentBlock.classList.add('timeline-content');
 
-        // Наповнюємо контент подіями
         yearEvents.forEach((event, index) => {
-            // Якщо це не перша подія в цьому році - додаємо лінію
             if (index > 0) {
                 const hr = document.createElement('hr');
+                // Стилі для лінії, щоб було гарно
+                hr.style.border = "0";
+                hr.style.height = "1px";
+                hr.style.background = "#ddd"; 
+                hr.style.margin = "15px 0";
                 contentBlock.appendChild(hr);
             }
 
-            // Заголовок
             const h3 = document.createElement('h3');
             h3.textContent = event.title;
             contentBlock.appendChild(h3);
 
-            // Текст
             const p = document.createElement('p');
             p.textContent = event.description;
             contentBlock.appendChild(p);
         });
 
-        // Збираємо все докупи
         item.appendChild(yearBlock);
         item.appendChild(contentBlock);
         timelineContainer.appendChild(item);
     });
 }
 
-// Запускаємо функцію при завантаженні
+// Запуск
 loadHistory();
-alert("працює");
