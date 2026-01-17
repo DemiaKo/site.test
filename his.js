@@ -53,7 +53,7 @@ async function loadHistory() {
 
         // Рік
         const yearBlock = document.createElement('div');
-        yearBlock.classList.add('timeline-year');
+        yearBlock.classList.add('timeline-date');
         yearBlock.textContent = year;
 
         // Контент
