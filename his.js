@@ -44,7 +44,7 @@ async function loadHistory() {
 
     timelineContainer.innerHTML = '';
 
-    Object.keys(groupedByYear).sort((a, b) => b - a).forEach(year => {
+    Object.keys(groupedByYear).sort((a, b) => a - b).forEach(year => {
         const yearEvents = groupedByYear[year];
 
         // Головний блок
